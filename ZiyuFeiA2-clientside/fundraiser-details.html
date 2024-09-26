@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Fundraisers</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body onload="loadFundraiserDetails()">
+<img src="banner.png" class="banner">
+<div class="top">
+    <ul>
+        <li>
+            <a href="index.html">Fundraiser Home</a>
+        </li>
+        <li>
+            <a href="search-fundraisers.html">Search Fundraisers</a>
+        </li>
+        <li>
+            <a href="fundraiser-details.html">Fundraiser Details</a>
+        </li>
+    </ul>
+</div>
+<img src="./avatar.png" class="avatar" />
+<section id="content">
+
+</section>
+<script>
+    function donate(id) {
+      console.log(id)
+      alert('This feature is under contruction”')
+    }
+
+  function loadFundraiserDetails() {
+    const id = localStorage.getItem("id")
+
+    if (!id) {
+      const content = document.querySelector("#content")
+      content.innerHTML = `<div class="no-matching">There is currently no funder available, you should choose one from the search page</div>`
+      return
+    }
+    fetch("http://localhost:3000/fundraiser/" + id)
+      .then(response => response.json())
+      .then(fundraiser => {
+        const content = document.querySelector("#content")
+        content.innerHTML += `
+                <div class="fds fds-one">
+                    <div class="id">ID: ${fundraiser.FUNDRAISER_ID}</div>
+                    <div class="organiser">Organiser: ${fundraiser.ORGANIZER}</div>
+                    <div class="caption">Caption: ${fundraiser.CAPTION}</div>
+                    <div class="target-funding">Target funding: ${fundraiser.TARGET_FUNDING} AU$</div>
+                    <div class="current-funding">Current funding: ${fundraiser.CURRENT_FUNDING} AU$</div>
+                    <div class="city">City: ${fundraiser.CITY}</div>
+                    <div class="active">Active: ${Boolean(fundraiser.ACTIVE)}</div>
+                    <div class="category">Category: ${fundraiser.CATEGORY_NAME}</div>
+                     <button class="view-button" onclick="donate(${fundraiser.FUNDRAISER_ID})">Donate</button>
+                </div>
+                `
+      })
+  }
+</script>
+</body>
+</html>

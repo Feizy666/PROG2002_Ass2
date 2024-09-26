@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Fundraisers</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body onload="loadCategories()">
+<img src="banner.png" class="banner">
+<div class="top">
+    <ul>
+        <li>
+            <a href="index.html">Fundraiser Home</a>
+        </li>
+        <li>
+            <a href="search-fundraisers.html">Search Fundraisers</a>
+        </li>
+        <li>
+            <a href="fundraiser-details.html">Fundraiser Details</a>
+        </li>
+    </ul>
+</div>
+<form class="search-from" onsubmit="searchFundraisers(event)">
+    <div class="form-control">
+        <label for="organizer">Organizer: </label>
+        <input id="organizer" type="text">
+    </div>
+    <div class="form-control">
+        <label for="city">City: </label>
+        <input id="city" type="text">
+    </div>
+    <div class="form-control">
+        <label for="category">Category: </label>
+        <select id="category">
+            <option value="">All Category</option>
+        </select>
+    </div>
+    <div class="form-control">
+        <button type="submit">Search</button>
+        <button type="reset">Clear</button>
+    </div>
+</form>
+<section id="content">
+
+</section>
+<script>
+  function viewDetails(id) {
+    localStorage.setItem("id", id)
+    location.href = "./fundraiser-details.html"
+  }
+
+  function searchFundraisers(event) {
+    event.preventDefault()
+
+    const organizer = document.querySelector("#organizer")
+    const city = document.querySelector("#city")
+    const category = document.querySelector("#category")
+
+    if (organizer.value.trim() !== "" || city.value.trim() !== "" || category.value.trim() !== "") {
+      let params = {
+        "organizer": organizer.value,
+        "city": city.value,
+        "category_id": category.value,
+      };
+
+      let query = Object.keys(params)
+        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+        .join('&');
+
+      fetch("http://localhost:3000/search?" + query)
+        .then(response => response.json())
+        .then(fundraisers => {
+          const content = document.querySelector("#content")
+          content.innerHTML = ''
+
+
+          if (fundraisers.length === 0) {
+            content.innerHTML = `
+                <div class="no-matching">there is no matching fundraisers</div>
+            `
+          } else {
+            fundraisers.forEach(fundraiser => {
+              content.innerHTML += `
+                <div class="fds">
+                    <div class="id">ID: ${fundraiser.FUNDRAISER_ID}</div>
+                    <div class="organiser">Organiser: ${fundraiser.ORGANIZER}</div>
+                    <div class="caption">Caption: ${fundraiser.CAPTION}</div>
+                    <div class="target-funding">Target funding: ${fundraiser.TARGET_FUNDING} AU$</div>
+                    <div class="current-funding">Current funding: ${fundraiser.CURRENT_FUNDING} AU$</div>
+                    <div class="city">City: ${fundraiser.CITY}</div>
+                    <div class="active">Active: ${Boolean(fundraiser.ACTIVE)}</div>
+                    <div class="category">Category: ${fundraiser.CATEGORY_NAME}</div>
+                    <button class="view-button" onclick="viewDetails(${fundraiser.FUNDRAISER_ID})">View Details</button>
+                </div>
+                `
+            })
+          }
+
+        })
+    } else {
+      alert('You should enter organizer or city or category')
+    }
+  }
+
+
+  function loadCategories() {
+    fetch("http://localhost:3000/category")
+      .then(response => response.json())
+      .then(categories => {
+        const category = document.querySelector("#category")
+
+        for (let c of categories) {
+          category.innerHTML += `
+                <option value="${c.CATEGORY_ID}">
+                  ${c.NAME}
+                </option>
+                `
+        }
+
+      })
+  }
+</script>
+</body>
+</html>

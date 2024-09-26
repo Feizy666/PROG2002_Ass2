@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fundraiser Home</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body onload="loadActiveFundraiserList()">
+    <img src="banner.png" class="banner">
+    <div class="top">
+        <ul>
+            <li>
+                <a href="index.html">Fundraiser Home</a>
+            </li>
+            <li>
+                <a href="search-fundraisers.html">Search Fundraisers</a>
+            </li>
+            <li>
+                <a href="fundraiser-details.html">Fundraiser Details</a>
+            </li>
+        </ul>
+    </div>
+    <section id="content">
+
+    </section>
+    <script>
+
+
+        function loadActiveFundraiserList() {
+          fetch("http://localhost:3000/fundraiser")
+          .then(response => response.json())
+          .then(fundraisers => {
+            const content = document.querySelector("#content")
+            fundraisers.forEach(fundraiser => {
+              content.innerHTML += `
+                <div class="fds">
+                    <div class="id">ID: ${fundraiser.FUNDRAISER_ID}</div>
+                    <div class="organiser">Organiser: ${fundraiser.ORGANIZER}</div>
+                    <div class="caption">Caption: ${fundraiser.CAPTION}</div>
+                    <div class="target-funding">Target funding: ${fundraiser.TARGET_FUNDING} AU$</div>
+                    <div class="current-funding">Current funding: ${fundraiser.CURRENT_FUNDING} AU$</div>
+                    <div class="city">City: ${fundraiser.CITY}</div>
+                    <div class="active">Active: ${Boolean(fundraiser.ACTIVE)}</div>
+                    <div class="category">Category: ${fundraiser.CATEGORY_NAME}</div>
+                </div>
+                `
+            })
+
+          })
+        }
+    </script>
+</body>
+</html>

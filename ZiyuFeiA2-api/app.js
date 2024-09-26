@@ -57,30 +57,32 @@ app.get('/search', (req, res) => {
                f.CURRENT_FUNDING, f.CITY, f.ACTIVE, c.NAME AS CATEGORY_NAME
         FROM FUNDRAISER f
         JOIN CATEGORY c ON f.CATEGORY_ID = c.CATEGORY_ID
-        WHERE f.ACTIVE = TRUE
+        WHERE f.ACTIVE = ?
     `;
 
   const { organizer, city, category_id } = req.query;
 
-  const queryParams = [];
+  const queryVals = [true];
 
   // Add to condition if query parameters exists.
   if (organizer) {
     query += ' AND f.ORGANIZER = ?';
-    queryParams.push(organizer);
+    queryVals.push(organizer);
   }
 
   if (city) {
     query += ' AND f.CITY = ?';
-    queryParams.push(city);
+    queryVals.push(city);
   }
 
   if (category_id) {
     query += ' AND f.CATEGORY_ID = ?';
-    queryParams.push(category_id);
+    queryVals.push(category_id);
   }
 
-  conn.query(query, (err, results, fields) => {
+  console.log(query)
+
+  conn.query(query, queryVals, (err, results, fields) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
